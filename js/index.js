@@ -1,0 +1,1 @@
+import buttonList from './js/buttons_list.js';
