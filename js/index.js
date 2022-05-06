@@ -23,6 +23,7 @@ const KEYBOARD = {
 
         this.elements.main.classList.add("keyboard", "-keyboard--hidden");
         this.elements.keysContainer.classList.add("keyboard--keys");
+        this.elements.keysContainer.appendChild(this._createKeys());
 
         this.elements.main.appendChild(this.elements.keysContainer);
         document.body.appendChild(this.elements.main);
@@ -32,9 +33,9 @@ const KEYBOARD = {
         const FRAGMENT = document.createDocumentFragment();
         const keyLayout = [
             "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "Backspace",
-            "Tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "&bsol;", "Del",
+            "Tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\", "Del",
             "Caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "Enter",
-            "Shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "ArrowUp", "Shift",
+            "Shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "/", "ArrowUp", "Shift2",
             "Ctrl", "Win", "Alt", "Space", "Alt", "ArrowLeft", "ArrowDown", "ArrowRight", "Ctrl"
         ];
 
@@ -44,14 +45,14 @@ const KEYBOARD = {
 
         keyLayout.forEach(key => {
             const KEY_ELEMENT = document.createElement("button");
-            const INSERT_LB = ["Backspace", "Del", "Enter", "Shift"].indexOf(key) !== -1;
+            const INSERT_LB = ["Backspace", "Del", "Enter", "Shift2"].indexOf(key) !== -1;
 
             KEY_ELEMENT.setAttribute("type", "button");
             KEY_ELEMENT.classList.add("keyboard__key");
 
             switch (key) {
                 case "Backspace":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide");
+                    KEY_ELEMENT.classList.add("keyboard__key--backspace");
                     KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("backspace");
 
                     KEY_ELEMENT.addEventListener("click", () => {
@@ -73,7 +74,7 @@ const KEYBOARD = {
                     break;
 
                 case "Enter":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide");
+                    KEY_ELEMENT.classList.add("keyboard__key--wide--enter");
                     KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_return");
 
                     KEY_ELEMENT.addEventListener("click", () => {
@@ -95,7 +96,13 @@ const KEYBOARD = {
                     break;
 
                 case "Shift":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide");
+                    KEY_ELEMENT.classList.add("keyboard__key--wide--shift");
+                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
+
+                    break;
+
+                case "Shift2":
+                    KEY_ELEMENT.classList.add("keyboard__key--wide--shift");
                     KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
 
                     break;
@@ -106,6 +113,7 @@ const KEYBOARD = {
                     break;
 
                 case "Tab":
+                    KEY_ELEMENT.classList.add("keyboard__key--wide--half");
                     KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_tab");
 
                     break;
@@ -130,18 +138,37 @@ const KEYBOARD = {
 
                     break;
 
+                case "`":
+                    KEY_ELEMENT.classList.add("keyboard__key--narrow");
+                    KEY_ELEMENT.textContent = key;
+
+                    break;
+
+                case "Del":
+                    KEY_ELEMENT.classList.add("keyboard__key--narrow");
+                    KEY_ELEMENT.textContent = key;
+
+                    break;
+
                 default:
                     KEY_ELEMENT.textContent = key;
                     KEY_ELEMENT.addEventListener("click", () => {
                         this.properties.value += this.properties.capsLock ? key.toUpperCase() : key.toLocaleLowerCase();
-                        this._triggerEvent("onclose");
-                    })
+                        this._triggerEvent("oninput");
+                    });
 
-
-
+                    break;
             }
 
-        })
+            FRAGMENT.appendChild(KEY_ELEMENT);
+
+            if (INSERT_LB) {
+                FRAGMENT.appendChild(document.createElement("br"));
+            }
+
+        });
+
+        return FRAGMENT;
     },
 
     _triggerEvent(handlerName) {
