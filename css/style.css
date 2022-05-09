@@ -1,20 +1,46 @@
-
-
-.keyboard {
-    left: 50%;
-    bottom: 50%;
-    transform: translate(50%, 50%);
-    width: fit-content;
-    padding: 2px;
-    border-radius: 4px;
-    background: #3b3b3b;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-    user-select: none;
-    transition: bottom 0.4s;
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #2c2c2c;
 }
 
-.keyboard--hidden {
-    bottom: -100%;
+header {
+    height: 75px;
+    width: 100%;
+    background-color: #494949;
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+footer {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 75px;
+    width: 100%;
+    background-color: #494949;
+    box-shadow: 0px -5px 5px rgba(0, 0, 0, 0.3);
+    bottom: 0;
+    color: #ffffff;
+    
+}
+
+.keyboard {
+    position: absolute;
+    width: 750px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 15%);
+    padding: 2px 5px 5px 5px;
+    border-radius: 4px;
+    border: solid 2px rgba(0, 0, 0, 0.4);
+    background: #494949;
+    box-shadow: 0 10px 0px rgba(0, 0, 0, 0.2);
+    user-select: none;
+    transition: bottom 0.4s;
 }
 
 .keyboard--keys {
@@ -24,13 +50,12 @@
 }
 
 .keyboard__key {
-    font-family: 'Roboto', sans-serif;
     height: 44px;
     width: 44px;
-    margin: 3px;
+    margin: 6px 3px;
     border-radius: 4px;
     border: none;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.4);
     color: #ffffff;
     font-size: 1.05rem;
     outline: none;
@@ -42,11 +67,22 @@
     padding: 0;
     -webkit-tap-highlight-color: transparent;
     position: relative;
+    transition: all .3s;
+    box-shadow: 0 5px 0 rgba(255, 255, 255, 0.3);
+}
+
+.keyboard__key:hover {
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 4px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(1px);
 }
 
 .keyboard__key:active {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(3px);
 }
+
 
 .keyboard__key--narrow {
     width: calc(33px);
@@ -93,4 +129,18 @@
 
 .keyboard__key--dark {
     background: rgba(0, 0, 0, 0.25);
+}
+
+.use-keyboard-input {
+    min-width: 380px;
+    max-width: 755px;
+    min-height: 300px;
+    max-height: 300px;
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 5px;
+    padding: 3px;
+    background-color: #bebebe;
 }
