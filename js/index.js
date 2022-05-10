@@ -22,45 +22,44 @@ let KEYBOARD = {
     },
 
     init() {
-        setTimeout(() => {
-            this.elements.textarea = document.createElement("textarea");
-            this.elements.main = document.createElement("div");
-            this.elements.keysContainer = document.createElement("div");
-            this.elements.header = document.createElement("header");
-            this.elements.h1 = document.createElement("h1");
-            this.elements.h2 = document.createElement("h2");
-            this.elements.footer = document.createElement("footer");
+        this.elements.textarea = document.createElement("textarea");
+        this.elements.main = document.createElement("div");
+        this.elements.keysContainer = document.createElement("div");
+        this.elements.header = document.createElement("header");
+        this.elements.h1 = document.createElement("h1");
+        this.elements.h2 = document.createElement("h2");
+        this.elements.footer = document.createElement("footer");
 
-            this.elements.h1.innerHTML = "RSS Virtual Keyboard";
-            this.elements.h2.innerHTML = "Virtual Keyboard created in Windows OS.";
-            this.elements.textarea.classList.add("use-keyboard-input");
-            this.elements.main.classList.add("keyboard");
-            this.elements.keysContainer.classList.add("keyboard--keys");
-            this.elements.keysContainer.appendChild(this._createKeys(buttonList.eng.unshift));
+        this.elements.h1.innerHTML = "RSS Virtual Keyboard";
+        this.elements.h2.innerHTML = "Virtual Keyboard created in Windows OS.";
+        this.elements.textarea.classList.add("use-keyboard-input");
+        this.elements.main.classList.add("keyboard");
+        this.elements.keysContainer.classList.add("keyboard--keys");
+        this.elements.keysContainer.appendChild(this._createKeys());
 
-            this.elements.keys = this.elements.keysContainer.querySelectorAll(".keyboard__key");
+        this.elements.keys = this.elements.keysContainer.querySelectorAll(".keyboard__key");
 
-            this.elements.main.appendChild(this.elements.keysContainer);
-            this.elements.header.appendChild(this.elements.h1);
-            this.elements.footer.appendChild(this.elements.h2);
-            document.body.appendChild(this.elements.header);
-            document.body.appendChild(this.elements.textarea);
-            document.body.appendChild(this.elements.main);
-            document.body.appendChild(this.elements.footer);
+        this.elements.main.appendChild(this.elements.keysContainer);
+        this.elements.header.appendChild(this.elements.h1);
+        this.elements.footer.appendChild(this.elements.h2);
+        document.body.appendChild(this.elements.header);
+        document.body.appendChild(this.elements.textarea);
+        document.body.appendChild(this.elements.main);
+        document.body.appendChild(this.elements.footer);
 
-            document.querySelectorAll(".use-keyboard-input").forEach(element => {
-                element.addEventListener("focus", () => {
-                    this.open(element.value, currentValue => {
-                        element.value = currentValue;
-                    });
+        document.querySelectorAll(".use-keyboard-input").forEach(element => {
+            element.addEventListener("focus", () => {
+                this.open(element.value, currentValue => {
+                    element.value = currentValue;
                 });
             });
-        }, 500);
+        });
     },
 
-    _createKeys(lang) {
+    _createKeys() {
         const FRAGMENT = document.createDocumentFragment();
-        let keyLayout = lang;
+        let keyLayout = buttonList.eng.unshift;
+        
 
         const CREATE_ICON_HTML = (icon_name) => {
             return `<i class="material-icons">${icon_name}</i>`;
@@ -177,7 +176,7 @@ let KEYBOARD = {
                     KEY_ELEMENT.textContent = key;
                     KEY_ELEMENT.dataset.shift = i++;
                     KEY_ELEMENT.addEventListener("click", () => {
-                        this.properties.value += this.properties.capsLock ? key.toUpperCase() : key.toLocaleLowerCase();
+                        this.properties.value += this.properties.capsLock ? key.toUpperCase() : key.toLowerCase();
                         this._triggerEvent("oninput");
                     });
 
@@ -222,14 +221,14 @@ let KEYBOARD = {
     },
 
     _triggerEvent(handlerName) {
-        console.log("Event Triggered! Event Name: " + handlerName);
+        
         if (typeof this.eventHandlers[handlerName] == "function") {
             this.eventHandlers[handlerName](this.properties.value);
         }
     },
 
     _toggleCapsLock() {
-        this.properties.capsLock = !this.properties.capsLock;
+        this.properties.capsLock =! this.properties.capsLock;
         for (const KEY of this.elements.keys) {
             if (KEY.childElementCount === 0) {
                 KEY.textContent = this.properties.capsLock ? KEY.textContent.toUpperCase() : KEY.textContent.toLowerCase();
@@ -239,15 +238,16 @@ let KEYBOARD = {
 
     _holdingShift() {
         for (const KEY of document.querySelectorAll("[data-shift]")) {
-            KEY.value = buttonList.engKeys.shift[KEY.getAttribute("data-shift")].toUpperCase();
-            KEY.innerHTML = buttonList.engKeys.shift[KEY.getAttribute("data-shift")].toUpperCase();
+            this.properties.value = buttonList.eng.shift[KEY.getAttribute("data-shift")].toUpperCase();
+            KEY.innerHTML = buttonList.eng.shift[KEY.getAttribute("data-shift")].toUpperCase();
+            
         }
     },
 
     _leavingShift() {
         for (const KEY of document.querySelectorAll("[data-shift]")) {
-            this.properties.value = buttonList.engKeys.shift[KEY.getAttribute("data-shift")].toLowerCase();
-            KEY.innerHTML = buttonList.engKeys.unshift[KEY.getAttribute("data-shift")].toLowerCase();
+            this.properties.value = buttonList.eng.unshift[KEY.getAttribute("data-shift")].toLowerCase();
+            KEY.innerHTML = buttonList.eng.unshift[KEY.getAttribute("data-shift")].toLowerCase();
         }
     },
 
