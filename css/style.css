@@ -82,6 +82,11 @@ footer {
     box-shadow: 0 2px 0 rgba(255, 255, 255, 0.2);
     transform: translateY(3px);
 }
+.keyboard__key--active {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(3px);
+}
 
 
 .keyboard__key--narrow {

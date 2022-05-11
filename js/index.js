@@ -1,5 +1,6 @@
 import buttonList from "./buttons_list.js";
 
+
 let KEYBOARD = {
     elements: {
         header: null,
@@ -67,6 +68,7 @@ let KEYBOARD = {
 
             KEY_ELEMENT.setAttribute("type", "button");
             KEY_ELEMENT.classList.add("keyboard__key");
+            KEY_ELEMENT.dataset.ecode = buttonList.data[i];
 
             switch (key) {
                 case "Backspace":
@@ -196,6 +198,7 @@ let KEYBOARD = {
                 default:
                     KEY_ELEMENT.textContent = key;
                     KEY_ELEMENT.dataset.shift = i++;
+
                     KEY_ELEMENT.addEventListener("mousedown", (button) => {
                         this._triggerEvent(button)
                     });
@@ -243,16 +246,24 @@ let KEYBOARD = {
 
 window.addEventListener("DOMContentLoaded", function () {
     KEYBOARD.init();
+    document.addEventListener("keydown", (e) => {
+        if (buttonList.data.includes(e.code)) {
+            let key = document.querySelector(`[data-ecode=${e.code}]`);
+            key.classList.add("keyboard__key--active");
+            KEYBOARD.elements.textarea.value += key.innerText;
+        }
+    });
+    document.addEventListener("keyup", (e) => {
+        if (buttonList.data.includes(e.code)) {
+            let key = document.querySelector(`[data-ecode=${e.code}]`);
+            key.classList.remove("keyboard__key--active");
+        }
+    });
+
     // setTimeout(() => {
     //     alert("Извините за беспокойство, если будет возможность, проверьте работу позже, числа 12-го. Заранее благодарю.");
     // }, 750);
 });
 
-setTimeout(() => {
-    window.addEventListener("keydown", (e) => {
-        console.log(document.querySelectorAll("keyboard__key")[0]);
-        // document.querySelectorAll("keyboard__key").forEach((key) => {
-    
-        // })
-    })
-}, 1000)
+
+
