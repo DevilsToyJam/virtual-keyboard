@@ -1,6 +1,10 @@
 /* eslint-disable-next-line */
 import buttonList from "./buttons_list.js";
 
+if (window.localStorage["lang"] === undefined) {
+  window.localStorage.setItem("lang", JSON.stringify("eng"))
+};
+
 const KEYBOARD = {
   elements: {
     header: null,
@@ -13,6 +17,8 @@ const KEYBOARD = {
     langSpan: null,
     keys: [],
   },
+
+  
 
   language: ["eng", "ru"],
   initLang: JSON.parse(localStorage["lang"]),
