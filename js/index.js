@@ -237,6 +237,7 @@ const KEYBOARD = {
     return FRAGMENT;
   },
 
+
   toggleCapsLock() {
     this.properties.capsLock = !this.properties.capsLock;
     document.querySelector("[data-ecode=CapsLock]").classList.toggle("keyboard__key--activated", this.properties.capsLock);
@@ -292,6 +293,7 @@ const KEYBOARD = {
     this.elements.textarea.value += button.target.innerText;
   },
 };
+
 
 function changeLanguage(lang) {
   KEYBOARD.properties.eng = !KEYBOARD.properties.eng;
