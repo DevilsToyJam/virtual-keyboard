@@ -13,7 +13,7 @@ const KEYBOARD = {
     keys: [],
   },
 
-  language: ['eng', 'ru'],
+  language: ["eng", "ru"],
 
   eventHandlers: {
     oninput: null,
@@ -81,9 +81,11 @@ const KEYBOARD = {
           KEY_ELEMENT.classList.add("keyboard__key--backspace");
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("backspace");
 
-          // KEY_ELEMENT.addEventListener("mousedown", () => {
-          //   this.elements.textarea.value;
-          // });
+          KEY_ELEMENT.addEventListener("click", () => {
+            
+            this.elements.textarea.focus();
+            this.elements.textarea.setSelectionRange(this.elements.textarea.selectionStart + 1, this.elements.textarea.selectionEnd + 1);
+          });
 
           break;
 
@@ -101,7 +103,7 @@ const KEYBOARD = {
           KEY_ELEMENT.classList.add("keyboard__key--wide--enter");
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_return");
 
-          KEY_ELEMENT.addEventListener("mousedown", () => {
+          KEY_ELEMENT.addEventListener("click", () => {
             this.elements.textarea.value += "\n";
           });
 
@@ -111,7 +113,7 @@ const KEYBOARD = {
           KEY_ELEMENT.classList.add("keyboard__key--extra--wide");
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("space_bar");
 
-          KEY_ELEMENT.addEventListener("mousedown", () => {
+          KEY_ELEMENT.addEventListener("click", () => {
             this.elements.textarea.value += " ";
           });
 
@@ -122,9 +124,11 @@ const KEYBOARD = {
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
 
           KEY_ELEMENT.addEventListener("mousedown", () => {
+            /* eslint-disable-next-line */
             this.properties.eng ? this.holdingShift(this.language[0]) : this.holdingShift(this.language[1]);
           });
           KEY_ELEMENT.addEventListener("mouseup", () => {
+            /* eslint-disable-next-line */
             this.properties.eng ? this.leavingShift(this.language[0]) : this.leavingShift(this.language[1]);
           });
 
@@ -135,9 +139,11 @@ const KEYBOARD = {
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
 
           KEY_ELEMENT.addEventListener("mousedown", () => {
+            /* eslint-disable-next-line */
             this.properties.eng ? this.holdingShift(this.language[0]) : this.holdingShift(this.language[1]);
           });
           KEY_ELEMENT.addEventListener("mouseup", () => {
+            /* eslint-disable-next-line */
             this.properties.eng ? this.leavingShift(this.language[0]) : this.leavingShift(this.language[1]);
           });
 
@@ -161,12 +167,22 @@ const KEYBOARD = {
 
         case "ArrowLeft":
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_left");
+          KEY_ELEMENT.addEventListener("click", () => {
+            
+            this.elements.textarea.focus();
+            this.elements.textarea.setSelectionRange(this.elements.textarea.selectionStart - 1, this.elements.textarea.selectionEnd - 1);
+          });
 
           break;
 
         case "ArrowRight":
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_right");
-
+          KEY_ELEMENT.addEventListener("click", () => {
+            
+            this.elements.textarea.focus();
+            this.elements.textarea.setSelectionRange(this.elements.textarea.selectionStart + 1, this.elements.textarea.selectionEnd + 1);
+          });
+          
           break;
 
         case "ArrowDown":
@@ -229,6 +245,10 @@ const KEYBOARD = {
       if (KEY.childElementCount === 0) {
         if (this.properties.capsLock && !this.properties.shift) {
           KEY.textContent = KEY.textContent.toUpperCase();
+        } else if (this.properties.capsLock && this.properties.shift) {
+          KEY.textContent = KEY.textContent.toLowerCase();
+        } else if (!this.properties.capsLock && this.properties.shift) {
+          KEY.textContent = KEY.textContent.toUpperCase();
         } else {
           KEY.textContent = KEY.textContent.toLowerCase();
         }
@@ -237,48 +257,72 @@ const KEYBOARD = {
   },
 
   holdingShift(lang) {
+    this.properties.shift = !this.properties.shift;
     /* eslint-disable-next-line */
     for (const KEY of document.querySelectorAll("[data-shift]")) {
-      KEY.innerHTML = buttonList[lang].shift[KEY.getAttribute("data-shift")].toUpperCase();
+      if (this.properties.capsLock && !this.properties.shift) {
+        KEY.innerHTML = buttonList[lang].shift[KEY.getAttribute("data-shift")].toLowerCase();
+      } else if (this.properties.capsLock && this.properties.shift) {
+        KEY.innerHTML = buttonList[lang].shift[KEY.getAttribute("data-shift")].toLowerCase();
+      } else if (!this.properties.capsLock && this.properties.shift) {
+        KEY.innerHTML = buttonList[lang].shift[KEY.getAttribute("data-shift")].toUpperCase();
+      } else {
+        KEY.innerHTML = buttonList[lang].shift[KEY.getAttribute("data-shift")].toUpperCase();
+      }
     }
   },
 
   leavingShift(lang) {
+    this.properties.shift = !this.properties.shift;
     /* eslint-disable-next-line */
     for (const KEY of document.querySelectorAll("[data-shift]")) {
-      KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
+      if (this.properties.capsLock && !this.properties.shift) {
+        KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toUpperCase();
+      } else if (this.properties.capsLock && this.properties.shift) {
+        KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toUpperCase();
+      } else if (!this.properties.capsLock && this.properties.shift) {
+        KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
+      } else {
+        KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
+      }    
     }
   },
 
   triggerEvent(button) {
     this.elements.textarea.value += button.target.innerText;
   },
-
 };
 
-function changeLanguage (lang) {
+function changeLanguage(lang) {
   KEYBOARD.properties.eng = !KEYBOARD.properties.eng;
+  /* eslint-disable-next-line */
   for (const KEY of document.querySelectorAll("[data-shift]")) {
     KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
-  };
-};
-  
+  }
+}
+
 const KEYDOWN_EVENTS = {
-  Backspace() { console.log("backspace"); },
+  Backspace() { 
+    let txtValue = KEYBOARD.elements.textarea.value;
+    txtValue.substring(0, txtValue.length - 1);
+  },
   Tab() { console.log("tab"); },
   Delete() { console.log("delete"); },
   CapsLock() { KEYBOARD.toggleCapsLock(); },
-  Enter() { },
+  Enter() { textArea.value += "\n"; },
+  /* eslint-disable-next-line */
   ShiftLeft() { KEYBOARD.properties.eng ? KEYBOARD.holdingShift(KEYBOARD.language[0]) : KEYBOARD.holdingShift(KEYBOARD.language[1]); },
+  /* eslint-disable-next-line */
   ShiftRight() { KEYBOARD.properties.eng ? KEYBOARD.holdingShift(KEYBOARD.language[0]) : KEYBOARD.holdingShift(KEYBOARD.language[1]); },
   ControlLeft() { KEYBOARD.properties.ctrl = !KEYBOARD.properties.ctrl; },
   MetaLeft() { },
   AltLeft() {
     if (KEYBOARD.properties.ctrl) {
+      /* eslint-disable-next-line */
       KEYBOARD.properties.eng ? changeLanguage(KEYBOARD.language[1]) : changeLanguage(KEYBOARD.language[0]);
     }
   },
-  Space() { },
+  Space() { textArea.value += " "; },
   AltRight() { },
   ArrowLeft() { },
   ArrowUp() { },
@@ -288,13 +332,16 @@ const KEYDOWN_EVENTS = {
 };
 
 const KEYUP_EVENTS = {
-  Backspace() { console.log("backspace"); },
-  Tab() { console.log("tab"); },
-  Delete() { console.log("delete"); },
+  Backspace() { },
+  Tab() { },
+  Delete() { },
   CapsLock() { },
   Enter() { },
+  /* eslint-disable-next-line */
   ShiftLeft() { KEYBOARD.properties.eng ? KEYBOARD.leavingShift(KEYBOARD.language[0]) : KEYBOARD.leavingShift(KEYBOARD.language[1]); },
+  /* eslint-disable-next-line */
   ShiftRight() { KEYBOARD.properties.eng ? KEYBOARD.leavingShift(KEYBOARD.language[0]) : KEYBOARD.leavingShift(KEYBOARD.language[1]); },
+  /* eslint-disable-next-line */
   ControlLeft() { KEYBOARD.properties.ctrl = !KEYBOARD.properties.ctrl; },
   MetaLeft() { },
   AltLeft() { },
