@@ -1,269 +1,337 @@
+/* eslint-disable-next-line */
 import buttonList from "./buttons_list.js";
 
+const KEYBOARD = {
+  elements: {
+    header: null,
+    h1: null,
+    textarea: null,
+    main: null,
+    keysContainer: null,
+    footer: null,
+    h2: null,
+    keys: [],
+  },
 
-let KEYBOARD = {
-    elements: {
-        header: null,
-        h1: null,
-        textarea: null,
-        main: null,
-        keysContainer: null,
-        footer: null,
-        h2: null,
-        keys: []
-    },
+  language: ['eng', 'ru'],
 
-    eventHandlers: {
-        oninput: null
-    },
+  eventHandlers: {
+    oninput: null,
+  },
 
-    properties: {
-        capsLock: false
-    },
+  properties: {
+    shift: false,
+    capsLock: false,
+    ctrl: false,
+    eng: true,
+  },
 
-    init() {
-        this.elements.textarea = document.createElement("textarea");
-        this.elements.main = document.createElement("div");
-        this.elements.keysContainer = document.createElement("div");
-        this.elements.header = document.createElement("header");
-        this.elements.h1 = document.createElement("h1");
-        this.elements.h2 = document.createElement("h2");
-        this.elements.footer = document.createElement("footer");
+  init() {
+    this.elements.textarea = document.createElement("textarea");
+    this.elements.main = document.createElement("div");
+    this.elements.keysContainer = document.createElement("div");
+    this.elements.header = document.createElement("header");
+    this.elements.h1 = document.createElement("h1");
+    this.elements.h2 = document.createElement("h2");
+    this.elements.footer = document.createElement("footer");
 
-        this.elements.h1.innerHTML = "RSS Virtual Keyboard";
-        this.elements.h2.innerHTML = "Virtual Keyboard created in Windows OS.";
-        this.elements.textarea.classList.add("use-keyboard-input");
-        this.elements.textarea.setAttribute("autofocus", "true");
-        this.elements.main.classList.add("keyboard");
-        this.elements.keysContainer.classList.add("keyboard--keys");
-        this.elements.keysContainer.appendChild(this._createKeys());
+    this.elements.h1.innerHTML = "RSS Virtual Keyboard";
+    this.elements.h2.innerHTML = "Virtual Keyboard created in Windows OS.";
+    this.elements.textarea.classList.add("use-keyboard-input");
+    this.elements.textarea.setAttribute("autofocus", "true");
+    this.elements.main.classList.add("keyboard");
+    this.elements.keysContainer.classList.add("keyboard--keys");
+    this.elements.keysContainer.appendChild(this.createKeys(this.language[0]));
 
-        this.elements.keys = this.elements.keysContainer.querySelectorAll(".keyboard__key");
+    this.elements.keys = this.elements.keysContainer.querySelectorAll(".keyboard__key");
 
-        this.elements.main.appendChild(this.elements.keysContainer);
-        this.elements.header.appendChild(this.elements.h1);
-        this.elements.footer.appendChild(this.elements.h2);
-        document.body.appendChild(this.elements.header);
-        document.body.appendChild(this.elements.textarea);
-        document.body.appendChild(this.elements.main);
-        document.body.appendChild(this.elements.footer);
-    },
+    this.elements.main.appendChild(this.elements.keysContainer);
+    this.elements.header.appendChild(this.elements.h1);
+    this.elements.footer.appendChild(this.elements.h2);
+    document.body.appendChild(this.elements.header);
+    document.body.appendChild(this.elements.textarea);
+    document.body.appendChild(this.elements.main);
+    document.body.appendChild(this.elements.footer);
+  },
 
-    _createKeys() {
-        const FRAGMENT = document.createDocumentFragment();
-        let keyLayout = buttonList.eng.unshift;
+  createKeys(lang) {
+    const FRAGMENT = document.createDocumentFragment();
+    const keyLayout = buttonList[lang].unshift;
 
-        const CREATE_ICON_HTML = (icon_name) => {
-            return `<i class="material-icons">${icon_name}</i>`;
-        };
+    const CREATE_ICON_HTML = (iconName) => {
+      const ICON = `<i class="material-icons">${iconName}</i>`;
+      return ICON;
+    };
 
-        const CREATE_SPAN_HTML = (button_name) => {
-            return `<span class="keyboard__key-name">${button_name}</span>`;
-        };
+    const CREATE_SPAN_HTML = (buttonName) => {
+      const SPAN = `<span class="keyboard__key-name">${buttonName}</span>`;
+      return SPAN;
+    };
 
-        keyLayout.forEach((key, i) => {
+    keyLayout.forEach((key, i) => {
+      const KEY_ELEMENT = document.createElement("button");
+      const INSERT_LB = ["Backspace", "Del", "Enter", "Shift2"].indexOf(key) !== -1;
 
-            const KEY_ELEMENT = document.createElement("button");
-            const INSERT_LB = ["Backspace", "Del", "Enter", "Shift2"].indexOf(key) !== -1;
+      KEY_ELEMENT.setAttribute("type", "button");
+      KEY_ELEMENT.classList.add("keyboard__key");
+      KEY_ELEMENT.dataset.ecode = buttonList.data[i];
 
-            KEY_ELEMENT.setAttribute("type", "button");
-            KEY_ELEMENT.classList.add("keyboard__key");
-            KEY_ELEMENT.dataset.ecode = buttonList.data[i];
+      switch (key) {
+        case "Backspace":
+          KEY_ELEMENT.classList.add("keyboard__key--backspace");
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("backspace");
 
-            switch (key) {
-                case "Backspace":
-                    KEY_ELEMENT.classList.add("keyboard__key--backspace");
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("backspace");
+          // KEY_ELEMENT.addEventListener("mousedown", () => {
+          //   this.elements.textarea.value;
+          // });
 
-                    // KEY_ELEMENT.addEventListener("mousedown", () => {
-                    //     this.elements.textarea.value 
-                    // });
+          break;
 
-                    break;
+        case "Caps":
+          KEY_ELEMENT.classList.add("keyboard__key--wide", "keyboard__key--activatable");
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_capslock");
 
-                case "Caps":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide", "keyboard__key--activatable");
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_capslock");
+          KEY_ELEMENT.addEventListener("mousedown", () => {
+            this.toggleCapsLock();
+          });
 
-                    KEY_ELEMENT.addEventListener("click", () => {
-                        this._toggleCapsLock();
-                        KEY_ELEMENT.classList.toggle("keyboard__key--active", this.properties.capsLock);
-                    });
+          break;
 
-                    break;
+        case "Enter":
+          KEY_ELEMENT.classList.add("keyboard__key--wide--enter");
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_return");
 
-                case "Enter":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide--enter");
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_return");
+          KEY_ELEMENT.addEventListener("mousedown", () => {
+            this.elements.textarea.value += "\n";
+          });
 
-                    KEY_ELEMENT.addEventListener("mousedown", () => {
-                        this.elements.textarea.value += "\n";
-                    });
+          break;
 
-                    break;
+        case "Space":
+          KEY_ELEMENT.classList.add("keyboard__key--extra--wide");
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("space_bar");
 
-                case "Space":
-                    KEY_ELEMENT.classList.add("keyboard__key--extra--wide");
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("space_bar");
+          KEY_ELEMENT.addEventListener("mousedown", () => {
+            this.elements.textarea.value += " ";
+          });
 
-                    KEY_ELEMENT.addEventListener("mousedown", () => {
-                        this.elements.textarea.value += " ";
-                    });
+          break;
 
-                    break;
+        case "Shift":
+          KEY_ELEMENT.classList.add("keyboard__key--wide--shift");
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
 
-                case "Shift":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide--shift");
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
+          KEY_ELEMENT.addEventListener("mousedown", () => {
+            this.properties.eng ? this.holdingShift(this.language[0]) : this.holdingShift(this.language[1]);
+          });
+          KEY_ELEMENT.addEventListener("mouseup", () => {
+            this.properties.eng ? this.leavingShift(this.language[0]) : this.leavingShift(this.language[1]);
+          });
 
-                    KEY_ELEMENT.addEventListener("mousedown", () => {
-                        this._holdingShift();
-                    });
-                    KEY_ELEMENT.addEventListener("mouseup", () => {
-                        this._leavingShift();
-                    });
+          break;
 
-                    break;
+        case "Shift2":
+          KEY_ELEMENT.classList.add("keyboard__key--wide--shift");
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
 
-                case "Shift2":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide--shift");
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
+          KEY_ELEMENT.addEventListener("mousedown", () => {
+            this.properties.eng ? this.holdingShift(this.language[0]) : this.holdingShift(this.language[1]);
+          });
+          KEY_ELEMENT.addEventListener("mouseup", () => {
+            this.properties.eng ? this.leavingShift(this.language[0]) : this.leavingShift(this.language[1]);
+          });
 
-                    KEY_ELEMENT.addEventListener("mousedown", () => {
-                        this._holdingShift();
-                    });
-                    KEY_ELEMENT.addEventListener("mouseup", () => {
-                        this._leavingShift();
-                    });
+          break;
 
-                    break;
+        case "Win":
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("window");
 
-                case "Win":
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("window");
+          break;
 
-                    break;
+        case "Tab":
+          KEY_ELEMENT.classList.add("keyboard__key--wide--half");
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_tab");
 
-                case "Tab":
-                    KEY_ELEMENT.classList.add("keyboard__key--wide--half");
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_tab");
+          break;
 
-                    break;
+        case "ArrowUp":
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_up");
 
-                case "ArrowUp":
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_up");
+          break;
 
-                    break;
+        case "ArrowLeft":
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_left");
 
-                case "ArrowLeft":
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_left");
+          break;
 
-                    break;
+        case "ArrowRight":
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_right");
 
-                case "ArrowRight":
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_right");
+          break;
 
-                    break;
+        case "ArrowDown":
+          KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_down");
 
-                case "ArrowDown":
-                    KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_down");
+          break;
 
-                    break;
+        case "`":
+          KEY_ELEMENT.classList.add("keyboard__key--narrow");
+          KEY_ELEMENT.textContent = key;
+          KEY_ELEMENT.dataset.shift = i;
+          KEY_ELEMENT.addEventListener("mousedown", (button) => {
+            this.elements.textarea.value += button.target.innerText;
+          });
 
-                case "`":
-                    KEY_ELEMENT.classList.add("keyboard__key--narrow");
-                    KEY_ELEMENT.textContent = key;
-                    KEY_ELEMENT.dataset.shift = i++;
-                    KEY_ELEMENT.addEventListener("mousedown", (button) => {
-                        this.elements.textarea.value += button.target.innerText;
-                    });
+          break;
 
-                    break;
+        case "Del":
+          KEY_ELEMENT.classList.add("keyboard__key--narrow");
+          KEY_ELEMENT.innerHTML = CREATE_SPAN_HTML("Del");
 
-                case "Del":
-                    KEY_ELEMENT.classList.add("keyboard__key--narrow");
-                    KEY_ELEMENT.innerHTML = CREATE_SPAN_HTML("Del");
+          break;
 
-                    break;
+        case "Alt":
+          KEY_ELEMENT.innerHTML = CREATE_SPAN_HTML("Alt");
 
-                case "Alt":
-                    KEY_ELEMENT.innerHTML = CREATE_SPAN_HTML("Alt");
+          break;
 
-                    break;
+        case "Ctrl":
+          KEY_ELEMENT.innerHTML = CREATE_SPAN_HTML("Ctrl");
 
-                case "Ctrl":
-                    KEY_ELEMENT.innerHTML = CREATE_SPAN_HTML("Ctrl");
+          break;
 
-                    break;
+        default:
+          KEY_ELEMENT.textContent = key;
+          KEY_ELEMENT.dataset.shift = i;
 
-                default:
-                    KEY_ELEMENT.textContent = key;
-                    KEY_ELEMENT.dataset.shift = i++;
+          KEY_ELEMENT.addEventListener("mousedown", (button) => {
+            this.triggerEvent(button);
+          });
 
-                    KEY_ELEMENT.addEventListener("mousedown", (button) => {
-                        this._triggerEvent(button)
-                    });
+          break;
+      }
 
-                    break;
-            }
+      FRAGMENT.appendChild(KEY_ELEMENT);
 
-            FRAGMENT.appendChild(KEY_ELEMENT);
+      if (INSERT_LB) {
+        FRAGMENT.appendChild(document.createElement("br"));
+      }
+    });
 
-            if (INSERT_LB) {
-                FRAGMENT.appendChild(document.createElement("br"));
-            }
+    return FRAGMENT;
+  },
 
-        });
-
-        return FRAGMENT;
-    },
-
-    _toggleCapsLock() {
-        this.properties.capsLock = !this.properties.capsLock;
-        for (const KEY of this.elements.keys) {
-            if (KEY.childElementCount === 0) {
-                KEY.textContent = this.properties.capsLock ? KEY.textContent.toUpperCase() : KEY.textContent.toLowerCase();
-            }
+  toggleCapsLock() {
+    this.properties.capsLock = !this.properties.capsLock;
+    document.querySelector("[data-ecode=CapsLock]").classList.toggle("keyboard__key--activated", this.properties.capsLock);
+    /* eslint-disable-next-line */
+    for (const KEY of this.elements.keys) {
+      if (KEY.childElementCount === 0) {
+        if (this.properties.capsLock && !this.properties.shift) {
+          KEY.textContent = KEY.textContent.toUpperCase();
+        } else {
+          KEY.textContent = KEY.textContent.toLowerCase();
         }
-    },
-
-    _holdingShift() {
-        for (const KEY of document.querySelectorAll("[data-shift]")) {
-            KEY.innerHTML = buttonList.eng.shift[KEY.getAttribute("data-shift")].toUpperCase();
-        }
-    },
-
-    _leavingShift() {
-        for (const KEY of document.querySelectorAll("[data-shift]")) {
-            KEY.innerHTML = buttonList.eng.unshift[KEY.getAttribute("data-shift")].toLowerCase();
-        }
-    },
-
-    _triggerEvent(button) {
-        this.elements.textarea.value += button.target.innerText;
+      }
     }
+  },
+
+  holdingShift(lang) {
+    /* eslint-disable-next-line */
+    for (const KEY of document.querySelectorAll("[data-shift]")) {
+      KEY.innerHTML = buttonList[lang].shift[KEY.getAttribute("data-shift")].toUpperCase();
+    }
+  },
+
+  leavingShift(lang) {
+    /* eslint-disable-next-line */
+    for (const KEY of document.querySelectorAll("[data-shift]")) {
+      KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
+    }
+  },
+
+  triggerEvent(button) {
+    this.elements.textarea.value += button.target.innerText;
+  },
 
 };
 
-window.addEventListener("DOMContentLoaded", function () {
-    KEYBOARD.init();
-    document.addEventListener("keydown", (e) => {
-        if (buttonList.data.includes(e.code)) {
-            let key = document.querySelector(`[data-ecode=${e.code}]`);
-            key.classList.add("keyboard__key--active");
-            KEYBOARD.elements.textarea.value += key.innerText;
-        }
-    });
-    document.addEventListener("keyup", (e) => {
-        if (buttonList.data.includes(e.code)) {
-            let key = document.querySelector(`[data-ecode=${e.code}]`);
-            key.classList.remove("keyboard__key--active");
-        }
-    });
+function changeLanguage (lang) {
+  KEYBOARD.properties.eng = !KEYBOARD.properties.eng;
+  for (const KEY of document.querySelectorAll("[data-shift]")) {
+    KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
+  };
+};
+  
+const KEYDOWN_EVENTS = {
+  Backspace() { console.log("backspace"); },
+  Tab() { console.log("tab"); },
+  Delete() { console.log("delete"); },
+  CapsLock() { KEYBOARD.toggleCapsLock(); },
+  Enter() { },
+  ShiftLeft() { KEYBOARD.properties.eng ? KEYBOARD.holdingShift(KEYBOARD.language[0]) : KEYBOARD.holdingShift(KEYBOARD.language[1]); },
+  ShiftRight() { KEYBOARD.properties.eng ? KEYBOARD.holdingShift(KEYBOARD.language[0]) : KEYBOARD.holdingShift(KEYBOARD.language[1]); },
+  ControlLeft() { KEYBOARD.properties.ctrl = !KEYBOARD.properties.ctrl; },
+  MetaLeft() { },
+  AltLeft() {
+    if (KEYBOARD.properties.ctrl) {
+      KEYBOARD.properties.eng ? changeLanguage(KEYBOARD.language[1]) : changeLanguage(KEYBOARD.language[0]);
+    }
+  },
+  Space() { },
+  AltRight() { },
+  ArrowLeft() { },
+  ArrowUp() { },
+  ArrowDown() { },
+  ArrowRight() { },
+  ControlRight() { },
+};
 
-    // setTimeout(() => {
-    //     alert("Извините за беспокойство, если будет возможность, проверьте работу позже, числа 12-го. Заранее благодарю.");
-    // }, 750);
+const KEYUP_EVENTS = {
+  Backspace() { console.log("backspace"); },
+  Tab() { console.log("tab"); },
+  Delete() { console.log("delete"); },
+  CapsLock() { },
+  Enter() { },
+  ShiftLeft() { KEYBOARD.properties.eng ? KEYBOARD.leavingShift(KEYBOARD.language[0]) : KEYBOARD.leavingShift(KEYBOARD.language[1]); },
+  ShiftRight() { KEYBOARD.properties.eng ? KEYBOARD.leavingShift(KEYBOARD.language[0]) : KEYBOARD.leavingShift(KEYBOARD.language[1]); },
+  ControlLeft() { KEYBOARD.properties.ctrl = !KEYBOARD.properties.ctrl; },
+  MetaLeft() { },
+  AltLeft() { },
+  Space() { },
+  AltRight() { },
+  ArrowLeft() { },
+  ArrowUp() { },
+  ArrowDown() { },
+  ArrowRight() { },
+  ControlRight() { },
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  KEYBOARD.init();
+  document.addEventListener("keydown", (e) => {
+    const KEY_CODE = e.code;
+    if (buttonList.data.includes(KEY_CODE) && !buttonList.exclude.includes(KEY_CODE)) {
+      const KEY = document.querySelector(`[data-ecode=${KEY_CODE}]`);
+      KEY.classList.add("keyboard__key--active");
+      e.preventDefault();
+      KEYBOARD.elements.textarea.value += KEY.innerText;
+    } else if (buttonList.exclude.includes(KEY_CODE)) {
+      const KEY = document.querySelector(`[data-ecode=${KEY_CODE}]`);
+      KEY.classList.add("keyboard__key--active");
+      e.preventDefault();
+      KEYDOWN_EVENTS[KEY_CODE]();
+    }
+  });
+  document.addEventListener("keyup", (e) => {
+    const KEY_CODE = e.code;
+    if (buttonList.data.includes(e.code) && !buttonList.exclude.includes(e.code)) {
+      const KEY = document.querySelector(`[data-ecode=${e.code}]`);
+      KEY.classList.remove("keyboard__key--active");
+    } else if (buttonList.exclude.includes(KEY_CODE)) {
+      const KEY = document.querySelector(`[data-ecode=${e.code}]`);
+      KEY.classList.remove("keyboard__key--active");
+      KEYUP_EVENTS[KEY_CODE]();
+    }
+  });
 });
-
-
-
