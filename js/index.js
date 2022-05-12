@@ -10,10 +10,12 @@ const KEYBOARD = {
     keysContainer: null,
     footer: null,
     h2: null,
+    langSpan: null,
     keys: [],
   },
 
   language: ["eng", "ru"],
+  initLang: JSON.parse(localStorage["lang"]),
 
   eventHandlers: {
     oninput: null,
@@ -33,21 +35,25 @@ const KEYBOARD = {
     this.elements.header = document.createElement("header");
     this.elements.h1 = document.createElement("h1");
     this.elements.h2 = document.createElement("h2");
+    this.elements.langSpan = document.createElement("span");
     this.elements.footer = document.createElement("footer");
 
     this.elements.h1.innerHTML = "RSS Virtual Keyboard";
     this.elements.h2.innerHTML = "Virtual Keyboard created in Windows OS.";
+    this.elements.langSpan.innerHTML = "Ctrl + Alt to swith language.";
     this.elements.textarea.classList.add("use-keyboard-input");
     this.elements.textarea.setAttribute("autofocus", "true");
     this.elements.main.classList.add("keyboard");
     this.elements.keysContainer.classList.add("keyboard--keys");
-    this.elements.keysContainer.appendChild(this.createKeys(this.language[0]));
+
+    this.elements.keysContainer.appendChild(this.createKeys(this.initLang));
 
     this.elements.keys = this.elements.keysContainer.querySelectorAll(".keyboard__key");
 
     this.elements.main.appendChild(this.elements.keysContainer);
     this.elements.header.appendChild(this.elements.h1);
     this.elements.footer.appendChild(this.elements.h2);
+    this.elements.footer.appendChild(this.elements.langSpan);
     document.body.appendChild(this.elements.header);
     document.body.appendChild(this.elements.textarea);
     document.body.appendChild(this.elements.main);
@@ -55,6 +61,7 @@ const KEYBOARD = {
   },
 
   createKeys(lang) {
+    this.initLang === "ru" ? this.properties.eng = false : this.properties.eng = true;
     const FRAGMENT = document.createDocumentFragment();
     const keyLayout = buttonList[lang].unshift;
 
@@ -82,9 +89,7 @@ const KEYBOARD = {
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("backspace");
 
           KEY_ELEMENT.addEventListener("click", () => {
-            
-            this.elements.textarea.focus();
-            this.elements.textarea.setSelectionRange(this.elements.textarea.selectionStart + 1, this.elements.textarea.selectionEnd + 1);
+            this.backSpace();
           });
 
           break;
@@ -124,12 +129,10 @@ const KEYBOARD = {
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
 
           KEY_ELEMENT.addEventListener("mousedown", () => {
-            /* eslint-disable-next-line */
-            this.properties.eng ? this.holdingShift(this.language[0]) : this.holdingShift(this.language[1]);
+            this.holdingShift();
           });
           KEY_ELEMENT.addEventListener("mouseup", () => {
-            /* eslint-disable-next-line */
-            this.properties.eng ? this.leavingShift(this.language[0]) : this.leavingShift(this.language[1]);
+            this.leavingShift();
           });
 
           break;
@@ -139,12 +142,10 @@ const KEYBOARD = {
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_control_key");
 
           KEY_ELEMENT.addEventListener("mousedown", () => {
-            /* eslint-disable-next-line */
-            this.properties.eng ? this.holdingShift(this.language[0]) : this.holdingShift(this.language[1]);
+            this.holdingShift();
           });
           KEY_ELEMENT.addEventListener("mouseup", () => {
-            /* eslint-disable-next-line */
-            this.properties.eng ? this.leavingShift(this.language[0]) : this.leavingShift(this.language[1]);
+            this.leavingShift();
           });
 
           break;
@@ -157,20 +158,24 @@ const KEYBOARD = {
         case "Tab":
           KEY_ELEMENT.classList.add("keyboard__key--wide--half");
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_tab");
+          KEY_ELEMENT.addEventListener("click", (button) => {
+            this.tabButton();
+          });
 
           break;
 
         case "ArrowUp":
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_up");
+          KEY_ELEMENT.addEventListener("click", () => {
+            this.arrowLeft();
+          });
 
           break;
 
         case "ArrowLeft":
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_left");
           KEY_ELEMENT.addEventListener("click", () => {
-            
-            this.elements.textarea.focus();
-            this.elements.textarea.setSelectionRange(this.elements.textarea.selectionStart - 1, this.elements.textarea.selectionEnd - 1);
+            this.arrowLeft();
           });
 
           break;
@@ -178,15 +183,16 @@ const KEYBOARD = {
         case "ArrowRight":
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_right");
           KEY_ELEMENT.addEventListener("click", () => {
-            
-            this.elements.textarea.focus();
-            this.elements.textarea.setSelectionRange(this.elements.textarea.selectionStart + 1, this.elements.textarea.selectionEnd + 1);
+            this.arrowRight();
           });
-          
+
           break;
 
         case "ArrowDown":
           KEY_ELEMENT.innerHTML = CREATE_ICON_HTML("keyboard_arrow_down");
+          KEY_ELEMENT.addEventListener("click", () => {
+            this.arrowRight();
+          });
 
           break;
 
@@ -200,9 +206,22 @@ const KEYBOARD = {
 
           break;
 
+        case "ё":
+          KEY_ELEMENT.classList.add("keyboard__key--narrow");
+          KEY_ELEMENT.textContent = key;
+          KEY_ELEMENT.dataset.shift = i;
+          KEY_ELEMENT.addEventListener("mousedown", (button) => {
+            this.elements.textarea.value += button.target.innerText;
+          });
+
+          break;
+
         case "Del":
           KEY_ELEMENT.classList.add("keyboard__key--narrow");
           KEY_ELEMENT.innerHTML = CREATE_SPAN_HTML("Del");
+          KEY_ELEMENT.addEventListener("click", () => {
+            this.delButton();
+          });
 
           break;
 
@@ -237,6 +256,52 @@ const KEYBOARD = {
     return FRAGMENT;
   },
 
+  arrowLeft() {
+    const textInput = this.elements.textarea;
+    textInput.focus();
+    textInput.setSelectionRange(textInput.selectionStart - 1, textInput.selectionEnd - 1);
+  },
+
+  arrowRight() {
+    const textInput = this.elements.textarea;
+    textInput.focus();
+    textInput.setSelectionRange(textInput.selectionStart + 1, textInput.selectionEnd + 1);
+  },
+
+  tabButton() {
+    const textInput = this.elements.textarea;
+    textInput.focus();
+    textInput.setRangeText("    ", textInput.selectionStart, textInput.selectionEnd);
+    textInput.setSelectionRange(textInput.selectionStart + 4, textInput.selectionStart + 4);
+  },
+
+  backSpace() {
+    const textInput = this.elements.textarea;
+    textInput.focus();
+    if (textInput.value.length === 0) {
+
+    } else {
+      if (textInput.selectionStart === textInput.selectionEnd) {
+        textInput.setRangeText('', textInput.selectionStart - 1, textInput.selectionEnd);
+        textInput.setSelectionRange(textInput.selectionStart, textInput.selectionStart);
+      } else {
+        textInput.setRangeText('', textInput.selectionStart, textInput.selectionEnd);
+        textInput.setSelectionRange(textInput.selectionStart, textInput.selectionStart);
+      }
+    }
+  },
+
+  delButton() {
+    const textInput = this.elements.textarea;
+    textInput.focus();
+    if (textInput.selectionStart === textInput.selectionEnd) {
+      textInput.setRangeText('', textInput.selectionStart, textInput.selectionEnd + 1);
+      textInput.setSelectionRange(textInput.selectionStart, textInput.selectionStart);
+    } else {
+      textInput.setRangeText('', textInput.selectionStart, textInput.selectionEnd);
+      textInput.setSelectionRange(textInput.selectionStart, textInput.selectionStart);
+    }
+  },
 
   toggleCapsLock() {
     this.properties.capsLock = !this.properties.capsLock;
@@ -257,8 +322,9 @@ const KEYBOARD = {
     }
   },
 
-  holdingShift(lang) {
+  holdingShift() {
     this.properties.shift = !this.properties.shift;
+    const lang = JSON.parse(localStorage["lang"]);
     /* eslint-disable-next-line */
     for (const KEY of document.querySelectorAll("[data-shift]")) {
       if (this.properties.capsLock && !this.properties.shift) {
@@ -273,8 +339,9 @@ const KEYBOARD = {
     }
   },
 
-  leavingShift(lang) {
+  leavingShift() {
     this.properties.shift = !this.properties.shift;
+    const lang = JSON.parse(localStorage["lang"]);
     /* eslint-disable-next-line */
     for (const KEY of document.querySelectorAll("[data-shift]")) {
       if (this.properties.capsLock && !this.properties.shift) {
@@ -285,7 +352,7 @@ const KEYBOARD = {
         KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
       } else {
         KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
-      }    
+      }
     }
   },
 
@@ -294,28 +361,24 @@ const KEYBOARD = {
   },
 };
 
-
 function changeLanguage(lang) {
   KEYBOARD.properties.eng = !KEYBOARD.properties.eng;
+  window.localStorage.setItem('lang', JSON.stringify(lang));
   /* eslint-disable-next-line */
   for (const KEY of document.querySelectorAll("[data-shift]")) {
     KEY.innerHTML = buttonList[lang].unshift[KEY.getAttribute("data-shift")].toLowerCase();
   }
+
 }
 
 const KEYDOWN_EVENTS = {
-  Backspace() { 
-    let txtValue = KEYBOARD.elements.textarea.value;
-    txtValue.substring(0, txtValue.length - 1);
-  },
-  Tab() { console.log("tab"); },
-  Delete() { console.log("delete"); },
+  Backspace() { KEYBOARD.backSpace(); },
+  Tab() { KEYBOARD.tabButton(); },
+  Delete() { KEYBOARD.delButton(); },
   CapsLock() { KEYBOARD.toggleCapsLock(); },
   Enter() { textArea.value += "\n"; },
-  /* eslint-disable-next-line */
-  ShiftLeft() { KEYBOARD.properties.eng ? KEYBOARD.holdingShift(KEYBOARD.language[0]) : KEYBOARD.holdingShift(KEYBOARD.language[1]); },
-  /* eslint-disable-next-line */
-  ShiftRight() { KEYBOARD.properties.eng ? KEYBOARD.holdingShift(KEYBOARD.language[0]) : KEYBOARD.holdingShift(KEYBOARD.language[1]); },
+  ShiftLeft() { KEYBOARD.holdingShift(); },
+  ShiftRight() { KEYBOARD.holdingShift(); },
   ControlLeft() { KEYBOARD.properties.ctrl = !KEYBOARD.properties.ctrl; },
   MetaLeft() { },
   AltLeft() {
@@ -326,10 +389,10 @@ const KEYDOWN_EVENTS = {
   },
   Space() { textArea.value += " "; },
   AltRight() { },
-  ArrowLeft() { },
-  ArrowUp() { },
-  ArrowDown() { },
-  ArrowRight() { },
+  ArrowLeft() { KEYBOARD.arrowLeft(); },
+  ArrowUp() { KEYBOARD.arrowLeft(); },
+  ArrowDown() { KEYBOARD.arrowRight(); },
+  ArrowRight() { KEYBOARD.arrowRight(); },
   ControlRight() { },
 };
 
@@ -340,9 +403,9 @@ const KEYUP_EVENTS = {
   CapsLock() { },
   Enter() { },
   /* eslint-disable-next-line */
-  ShiftLeft() { KEYBOARD.properties.eng ? KEYBOARD.leavingShift(KEYBOARD.language[0]) : KEYBOARD.leavingShift(KEYBOARD.language[1]); },
+  ShiftLeft() { KEYBOARD.leavingShift(); },
   /* eslint-disable-next-line */
-  ShiftRight() { KEYBOARD.properties.eng ? KEYBOARD.leavingShift(KEYBOARD.language[0]) : KEYBOARD.leavingShift(KEYBOARD.language[1]); },
+  ShiftRight() { KEYBOARD.leavingShift(); },
   /* eslint-disable-next-line */
   ControlLeft() { KEYBOARD.properties.ctrl = !KEYBOARD.properties.ctrl; },
   MetaLeft() { },
