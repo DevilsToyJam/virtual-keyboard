@@ -382,7 +382,7 @@ const KEYDOWN_EVENTS = {
   Tab() { KEYBOARD.tabButton(); },
   Delete() { KEYBOARD.delButton(); },
   CapsLock() { KEYBOARD.toggleCapsLock(); },
-  Enter() { textArea.value += "\n"; },
+  Enter() { KEYBOARD.elements.textarea.value += "\n"; },
   ShiftLeft() { KEYBOARD.holdingShift(); },
   ShiftRight() { KEYBOARD.holdingShift(); },
   ControlLeft() { KEYBOARD.properties.ctrl = !KEYBOARD.properties.ctrl; },
